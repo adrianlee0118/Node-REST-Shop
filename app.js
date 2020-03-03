@@ -1,10 +1,9 @@
 const express = require('express');
 const app = express();
 
-app.use((req,res,next) => {
-    res.status(200).json({
-        message: 'It works!'
-    });
-});
+const ProductRoutes = require('./api/routes/products');
+
+//middleware - every request is funneled through here like a relay station
+app.use('/products', ProductRoutes);
 
 module.exports = app;
