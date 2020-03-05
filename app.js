@@ -13,7 +13,8 @@ mongoose.connect(
     process.env.MONGO_ATLAS_PW +
     "@cluster17-go7xy.mongodb.net/test?retryWrites=true&w=majority",
     {
-        useNewUrlParser:true
+        useNewUrlParser:true,
+        useUnifiedTopology:true
     }
 );
 
