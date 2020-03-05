@@ -1,10 +1,10 @@
-const express = require("express");
+const express = require("express");           //streamlines URL endpoint function mapping
 const app = express();
-const morgan = require("morgan");
-const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
+const morgan = require("morgan");             //enables default logging
+const bodyParser = require("body-parser");    //enables us to parse incoming JSON data in the body of a request
+const mongoose = require("mongoose");         //enables us to connect to MongoDB Atlas (cloud database)
 
-const productRoutes = require("./api/routes/products");
+const productRoutes = require('./api/routes/products');
 const orderRoutes = require("./api/routes/orders");
 
 //pw from nodemon.json environment variables
@@ -19,6 +19,7 @@ mongoose.connect(
 );
 
 app.use(morgan("dev")); //middleware- default logging of all operations in terminal
+app.use('/uploads',express.static('uploads'));   //makes uploads folder static, or publically available, so that images can be loaded at domain/foldername/photoname
 app.use(bodyParser.urlencoded({ extended: false })); //middleware- parsing JSON request body, slotting in received data appopriately
 app.use(bodyParser.json());
 

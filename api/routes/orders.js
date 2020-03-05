@@ -3,7 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 
 const Order = require("../models/order"); //for order objects
-const Product = require("../models/products"); //for product objects, used by POST function at beginning to check if the product being put into an order exists within database
+const Product = require("../models/product"); //for product objects, used by POST function at beginning to check if the product being put into an order exists within database
 
 router.get("/", (req, res, next) => {
   Order.find()

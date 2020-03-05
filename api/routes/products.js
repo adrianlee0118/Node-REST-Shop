@@ -1,13 +1,42 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+const multer = require('multer');            //enable parsing of form-data in the request body text (cannot be handled by body-parser, which only does JSON)
 
-const Product = require("../models/products");
+const storage = multer.diskStorage({         //configure storage directory and file name
+  destination: function(req, file, cb) {
+      cb(null, './uploads/');
+  },
+  filename: function(req, file, cb) {
+      const now = new Date().toISOString(); 
+      const date = now.replace(/:/g, '-'); 
+      cb(null, date + file.originalname);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  //accept file if jpeg or png, reject all other file types
+  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png'){
+    cb(null,true);
+  } else {
+    cb(null, false);
+  }
+}
+
+const upload = multer({ 
+  storage: storage, 
+  limits: {
+    fileSize: 1024 * 1024 * 5
+  },
+  fileFilter: fileFilter
+});   //machine that parses the incoming body text for form-data, limit file size to 5 MB
+
+const Product = require("../models/product");
 
 router.get("/", (req, res, next) => {
   //path is './' because middleware in apps.js has already parsed the /products in the URL--in order to get to this file, the URL must already have '/products' in it
   Product.find()
-    .select('name price _id')    //control which data is fetched
+    .select('name price _id productImage')    //control which data is fetched
     .exec()                      //allows us to pass the previous function without a callback (putting the callback in exec() instead), handy for building queries after function
     .then(docs => {
       const response = {    //return this json object instead of docs --> more structure, easier to understand
@@ -16,6 +45,7 @@ router.get("/", (req, res, next) => {
           return {
             name: doc.name,
             price: doc.price,
+            productImage: doc.productImage,
             _id: doc._id,
             url: {
               request: {   //link to allow us to examine just this item in the list that is returned
@@ -42,15 +72,13 @@ router.get("/", (req, res, next) => {
     });
 });
 
-router.post("/", (req, res, next) => {
-  /*const product = {             //old product object before mongoose integration, with mongoose, use mongoose model schema
-        name: req.body.name,
-        price: req.body.price
-    };*/
-  const product = new Product({
+router.post("/", upload.single('productImage'), (req, res, next) => {   //can pass middleware like multer (parser) before the (req,res,next) argument callback fcn - upload.single() parses body as a single file, identifies argument 'productImage'
+console.log(req.file); 
+const product = new Product({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
-    price: req.body.price
+    price: req.body.price,
+    productImage: req.file.path
   });
   product
     .save() //save mongoose model to db, provide a promise/callback fcn to check result else error notification
@@ -80,7 +108,7 @@ router.post("/", (req, res, next) => {
 router.get("/:productId", (req, res, next) => {
   const id = req.params.productId;
   Product.findById(id)
-  .select('name price _id')
+  .select('name price _id productImage')
     .exec()
     .then(doc => {
       console.log("From database", doc);
