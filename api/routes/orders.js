@@ -8,6 +8,7 @@ const Product = require("../models/products"); //for product objects, used by PO
 router.get("/", (req, res, next) => {
   Order.find()
     .select("product quantity _id")
+    .populate("product", "name") //reaches into order.js schema for ref schema of Product (from products.js), outputs the properties you selected with second argument (separate with space if multiple, same as select query)
     .exec()
     .then(docs => {
       res.status(200).json({
@@ -74,6 +75,7 @@ router.post("/", (req, res, next) => {
 
 router.get("/:orderId", (req, res, next) => {
   Order.findById(req.params.orderId)
+    .populate("product")    //outputs all data of Product object schema that is referenced in orders object schema
     .exec()
     .then(order => {
       if (!order) {
