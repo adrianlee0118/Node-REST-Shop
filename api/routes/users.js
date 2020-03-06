@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken"); //enable token that server passes back to client upon successful authorization (login) to indicate authentication (reusable)
 
 const User = require("../models/user");
