@@ -3,6 +3,7 @@
 
 //with the inclusion of this middleware in functions, API calls must be passed along with an authorization JWT token in the header
 //JWT makes sure the client can identify itself to the server and access protected resources WITHOUT the server having to store information about the client
+//We can pass this function to any call that should be protected (i.e. accessing data)
 const jwt = require('jsonwebtoken');
 
 module.exports = (req, res, next) => {
