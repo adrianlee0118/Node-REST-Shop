@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const multer = require('multer');            //enable parsing of form-data in the request body text (cannot be handled by body-parser, which only does JSON)
+const checkAuth = require('../middleware/check-auth');  //maintaining security of routes (API CRUD calls)
 
 const storage = multer.diskStorage({         //configure storage directory and file name
   destination: function(req, file, cb) {
@@ -72,7 +73,7 @@ router.get("/", (req, res, next) => {
     });
 });
 
-router.post("/", upload.single('productImage'), (req, res, next) => {   //can pass middleware like multer (parser) before the (req,res,next) argument callback fcn - upload.single() parses body as a single file, identifies argument 'productImage'
+router.post("/", checkAuth, upload.single('productImage'), (req, res, next) => {   //can pass middleware like multer (parser) before the (req,res,next) argument callback fcn - upload.single() parses body as a single file, identifies argument 'productImage'
 console.log(req.file); 
 const product = new Product({
     _id: new mongoose.Types.ObjectId(),
@@ -134,7 +135,7 @@ router.get("/:productId", (req, res, next) => {
     });
 });
 
-router.patch("/:productId", (req, res, next) => {
+router.patch("/:productId", checkAuth, (req, res, next) => {
   const id = req.params.productId;
   const updateOps = {};
   for (const ops of req.body) {            //loop through request body to determine which properties need to be updated
@@ -160,7 +161,7 @@ router.patch("/:productId", (req, res, next) => {
     });
 });
 
-router.delete("/:productId", (req, res, next) => {
+router.delete("/:productId", checkAuth, (req, res, next) => {
   const id = req.params.productId;
   Product.remove({ _id: id })
     .exec()

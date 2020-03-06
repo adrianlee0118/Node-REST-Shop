@@ -1,11 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+const checkAuth = require('../middleware/check-auth');
 
 const Order = require("../models/order"); //for order objects
 const Product = require("../models/product"); //for product objects, used by POST function at beginning to check if the product being put into an order exists within database
 
-router.get("/", (req, res, next) => {
+router.get("/", checkAuth, (req, res, next) => {
   Order.find()
     .select("product quantity _id")
     .populate("product", "name") //reaches into order.js schema for ref schema of Product (from products.js), outputs the properties you selected with second argument (separate with space if multiple, same as select query)
@@ -33,7 +34,7 @@ router.get("/", (req, res, next) => {
     });
 });
 
-router.post("/", (req, res, next) => {
+router.post("/", checkAuth, (req, res, next) => {
   Product.findById(req.body.productId) //if successfully found, do .then(), else do .catch()
     .then(product => {
       //if we have a product try to save it
@@ -73,7 +74,7 @@ router.post("/", (req, res, next) => {
     });
 });
 
-router.get("/:orderId", (req, res, next) => {
+router.get("/:orderId", checkAuth, (req, res, next) => {
   Order.findById(req.params.orderId)
     .populate("product")    //outputs all data of Product object schema that is referenced in orders object schema
     .exec()
@@ -99,7 +100,7 @@ router.get("/:orderId", (req, res, next) => {
     });
 });
 
-router.delete("/:orderId", (req, res, next) => {
+router.delete("/:orderId", checkAuth, (req, res, next) => {
   Order.remove({ _id: req.params.orderId })
     .exec()
     .then(result => {

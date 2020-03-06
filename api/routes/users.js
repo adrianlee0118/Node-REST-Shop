@@ -78,7 +78,7 @@ router.post("/login", (req, res, next) => {
             },
             process.env.JWT_KEY, //use environment variable from nodemon.json
             {
-              expiresIn: "1h"
+              expiresIn: "1h"  //login token (that indicates you are authorized) lasts for 1 h, accepts time in seconds or string indicating time period (check docs)
             }
           );
           return res.status(200).json({
